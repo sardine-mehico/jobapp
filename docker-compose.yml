@@ -1,6 +1,6 @@
 services:
   jobapp-api:
-    image: ghcr.io/sardine-mehico/jobapp-api:1.9
+    build: ./api
     container_name: jobapp-api
     restart: unless-stopped
     environment:
@@ -33,7 +33,7 @@ services:
       - "9000:80"
 
   jobapp-nuxt:
-    image: ghcr.io/sardine-mehico/jobapp-nuxt:1.9
+    build: ./frontend
     container_name: jobapp-nuxt
     restart: unless-stopped
     environment:

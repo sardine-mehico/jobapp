@@ -52,6 +52,23 @@ const applicationRankingLabel = computed(() => {
   return rankingOptions.find((option) => option.value === ranking)?.label || 'Unranked'
 })
 
+function normalizeRichText(value: string | null | undefined) {
+  if (!value) {
+    return null
+  }
+
+  const normalized = value
+    .replace(/<p>\s*<\/p>/gi, '')
+    .replace(/<p><br><\/p>/gi, '')
+    .trim()
+
+  return normalized || null
+}
+
+function employerNotesHtml(value: string | null | undefined) {
+  return normalizeRichText(value) || '<p>-</p>'
+}
+
 function flagClass(color: 'yellow' | 'red') {
   return color === 'yellow'
     ? 'rounded-md bg-yellow-100 px-3 py-3'
@@ -114,7 +131,7 @@ function normalizedDraftPayload(source: any) {
     work_exp_2: source.work_exp_2 || null,
     references: source.references || '',
     employer_ranking: source.employer_ranking || null,
-    employer_notes: source.employer_notes || null
+    employer_notes: normalizeRichText(source.employer_notes)
   }
 }
 
@@ -244,22 +261,17 @@ onMounted(async () => {
   <div class="page-shell employer-ui">
     <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" @logout="signOut" />
 
-    <main class="admin-main lg:ml-72">
+    <main class="admin-main md:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-hero">
-          <div>
-            <NuxtLink class="admin-link" to="/admin/applications">Back to Applications</NuxtLink>
-            <div class="admin-eyebrow mt-4">Application Detail</div>
-            <h1 class="admin-title">{{ application?.name || 'Application detail' }}</h1>
-            <p class="admin-subtitle">Review candidate details, apply a ranking, and make employer-side corrections without affecting the public application form.</p>
-          </div>
-          <div class="admin-toolbar">
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
+        <div class="flex items-center justify-between">
+          <NuxtLink class="btn-admin-outline" to="/admin/applications">Back</NuxtLink>
+          <div class="flex items-center gap-3">
             <span v-if="application" :class="['admin-badge', applicationIsRead ? 'admin-badge--neutral' : 'admin-badge--primary']">
               {{ applicationIsRead ? 'Read' : 'Unread' }}
             </span>
+            <button class="btn-admin-outline md:hidden" @click="sidebarOpen = true">Menu</button>
           </div>
-        </section>
+        </div>
 
         <div v-if="loading" class="card text-slate-500">Loading application...</div>
 
@@ -390,7 +402,7 @@ onMounted(async () => {
 
                 <div>
                   <label class="label">Employer Notes</label>
-                  <textarea v-model="draft.employer_notes" class="input min-h-40" />
+                  <RichTextEditor v-model="draft.employer_notes" :show-link="false" placeholder="Add employer notes..." />
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
@@ -478,7 +490,7 @@ onMounted(async () => {
 
                 <div>
                   <div class="label">Employer Notes</div>
-                  <div class="whitespace-pre-wrap text-slate-700">{{ application.employer_notes || '-' }}</div>
+                  <div class="prose-content text-slate-700" v-html="employerNotesHtml(application.employer_notes)" />
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">

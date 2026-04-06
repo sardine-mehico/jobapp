@@ -423,6 +423,8 @@ select.input {
   }
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .employer-ui {
   --admin-radius: 0.375rem;
   --admin-bg: linear-gradient(180deg, #f4f8ff 0%, #eef5ff 48%, #f8fbff 100%);
@@ -441,6 +443,7 @@ select.input {
   --admin-success: #0f9f6e;
   --admin-warning: #c57a11;
   --admin-danger: #c54545;
+  font-family: 'Inter', sans-serif;
   background:
     radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32%),
     radial-gradient(circle at top right, rgba(96, 165, 250, 0.18), transparent 28%),
@@ -1032,6 +1035,14 @@ select.input {
   display: list-item;
 }
 
+.prose-content mark,
+.tiptap mark {
+  background: rgba(250, 204, 21, 0.38);
+  border-radius: 0.2rem;
+  color: inherit;
+  padding: 0 0.12rem;
+}
+
 .tiptap {
   @apply min-h-48 rounded-b-md border border-t-0 border-slate-200 px-3 py-3 outline-none;
 }
@@ -1039,4 +1050,10 @@ select.input {
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   @apply pointer-events-none float-left h-0 text-slate-400;
+}
+
+@media (min-width: 768px) {
+  .md\:hidden {
+    display: none !important;
+  }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\JobController;
+use App\Http\Controllers\Api\KnowledgebaseNoteController;
 use App\Http\Controllers\Api\PublicApplicationController;
 use App\Http\Controllers\Api\TrackingLinkController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/applications/{application}', [ApplicationController::class, 'show']);
     Route::patch('/applications/{application}', [ApplicationController::class, 'update']);
     Route::get('/applications/{application}/export-pdf', [ApplicationController::class, 'exportPdf']);
+
+    Route::get('/knowledgebase-notes', [KnowledgebaseNoteController::class, 'index']);
+    Route::post('/knowledgebase-notes', [KnowledgebaseNoteController::class, 'store']);
+    Route::get('/knowledgebase-notes/{knowledgebaseNote}', [KnowledgebaseNoteController::class, 'show']);
+    Route::put('/knowledgebase-notes/{knowledgebaseNote}', [KnowledgebaseNoteController::class, 'update']);
+    Route::delete('/knowledgebase-notes/{knowledgebaseNote}', [KnowledgebaseNoteController::class, 'destroy']);
 });
 
 Route::middleware('throttle:30,1')->group(function (): void {

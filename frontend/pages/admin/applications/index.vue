@@ -127,28 +127,7 @@ onMounted(async () => {
 
     <main class="admin-main lg:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-stat-grid">
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Results</div>
-            <div class="admin-stat-value">{{ totalApplications }}</div>
-            <p class="admin-stat-meta">Applications matching your current search and filters.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Unread</div>
-            <div class="admin-stat-value">{{ visibleUnreadCount }}</div>
-            <p class="admin-stat-meta">Visible applications still waiting on an employer ranking.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Read</div>
-            <div class="admin-stat-value">{{ visibleReadCount }}</div>
-            <p class="admin-stat-meta">Visible applications already reviewed and ranked.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Flagged</div>
-            <div class="admin-stat-value">{{ flaggedCount }}</div>
-            <p class="admin-stat-meta">Visible applications with higher-risk compensation or conviction flags.</p>
-          </article>
-        </section>
+
 
         <section class="card">
           <div class="admin-panel-header">
@@ -156,14 +135,11 @@ onMounted(async () => {
               <h2 class="admin-panel-title">Search applications</h2>
             </div>
           </div>
-          <div class="mt-5 flex flex-wrap gap-3">
+          <div class="mt-5 flex flex-wrap gap-3 items-center">
+            <input v-model="search" class="input !w-64" placeholder="Search applications" @keyup.enter="loadData()" />
+            <button class="btn-admin-primary" @click="loadData()">Search</button>
             <button class="btn-admin-outline" @click="filtersOpen = !filtersOpen">{{ filtersOpen ? 'Hide Filters' : 'Filters' }}</button>
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
-          </div>
-          <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-            <input v-model="search" class="input" placeholder="Search applications" @keyup.enter="loadData()" />
-            <button class="btn-admin-primary sm:self-start" @click="loadData()">Search</button>
-            <button class="btn-admin-outline sm:self-start" @click="clearSearch">Clear</button>
+            <button class="btn-admin-outline md:!hidden ml-auto" @click="sidebarOpen = true">Menu</button>
           </div>
         </section>
 

@@ -30,41 +30,13 @@ onMounted(async () => {
   <div class="page-shell employer-ui">
     <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" @logout="signOut" />
 
-    <main class="admin-main lg:ml-72">
+    <main class="admin-main md:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-hero">
-          <div>
-            <div class="admin-eyebrow">Overview</div>
-            <h1 class="admin-title">Employer dashboard</h1>
-            <p class="admin-subtitle">Track live roles, candidate volume, and shareable job links from a clearer blue workspace.</p>
-          </div>
-          <div class="admin-toolbar">
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
-          </div>
-        </section>
+        <div class="flex mb-4">
+          <button class="btn-admin-outline md:hidden" @click="sidebarOpen = true">Menu</button>
+        </div>
 
-        <section class="admin-stat-grid">
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Total Jobs</div>
-            <div class="admin-stat-value">{{ totalJobs }}</div>
-            <p class="admin-stat-meta">All roles currently stored in the system.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Active Jobs</div>
-            <div class="admin-stat-value">{{ activeJobs }}</div>
-            <p class="admin-stat-meta">Jobs still visible and ready to accept applications.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Applications</div>
-            <div class="admin-stat-value">{{ totalApplications }}</div>
-            <p class="admin-stat-meta">Combined applicant volume across every job.</p>
-          </article>
-          <article class="admin-stat-card">
-            <div class="admin-stat-label">Tracked Links</div>
-            <div class="admin-stat-value">{{ totalLinks }}</div>
-            <p class="admin-stat-meta">Trackable links available for external posts and ads.</p>
-          </article>
-        </section>
+
 
         <section class="card space-y-4">
           <div class="admin-panel-header">

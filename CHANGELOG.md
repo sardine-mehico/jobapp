@@ -1,5 +1,13 @@
 # Changelog
 
+## version 1.9.2
+
+- Extensive UI layout, padding, and block streamlining for the admin interface
+- Consolidated Search and Action buttons into single rows for Jobs/Applications lists
+- Replaced the textual "Active" yes/no radio buttons with a unified slider switch
+- Restored confirmation logic for Delete buttons on Jobs/Knowledgebase records
+- Removed obsolete helper text blurbs and simplified statistics layouts
+
 ## version 1.7
 
 ui changes to Jobs list for Applicants

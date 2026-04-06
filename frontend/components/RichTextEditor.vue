@@ -1,13 +1,40 @@
 <script setup lang="ts">
 import Link from '@tiptap/extension-link'
+import { Mark, mergeAttributes } from '@tiptap/core'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
 
-const props = defineProps<{
+const TextHighlight = Mark.create({
+  name: 'highlight',
+
+  parseHTML() {
+    return [{ tag: 'mark' }]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['mark', mergeAttributes(HTMLAttributes), 0]
+  },
+
+  addCommands() {
+    return {
+      setHighlight: () => ({ commands }) => commands.setMark(this.name),
+      toggleHighlight: () => ({ commands }) => commands.toggleMark(this.name),
+      unsetHighlight: () => ({ commands }) => commands.unsetMark(this.name),
+    }
+  },
+})
+
+const props = withDefaults(defineProps<{
   modelValue: string
   placeholder?: string
-}>()
+  showLink?: boolean
+  showHighlight?: boolean
+}>(), {
+  placeholder: '',
+  showLink: true,
+  showHighlight: false
+})
 
 const emit = defineEmits<{
   'update:modelValue': [string]
@@ -16,6 +43,7 @@ const emit = defineEmits<{
 const editor = useEditor({
   extensions: [
     StarterKit,
+    TextHighlight,
     Underline,
     Link.configure({
       openOnClick: false,
@@ -99,6 +127,13 @@ function setLink() {
           <path d="M5 20h14" />
         </svg>
       </button>
+      <button v-if="props.showHighlight" class="btn-secondary !min-h-9 !px-3 !py-2" :class="{ '!border-blue-500 !bg-blue-50 !text-blue-700': editor?.isActive('highlight') }" title="Highlight" aria-label="Highlight" type="button" @mousedown.prevent @click="runCommand(() => editor?.chain().focus().toggleHighlight().run())">
+        <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24">
+          <path d="m7 16 6.5-6.5 3 3L10 19H7z" />
+          <path d="M14 6l3 3" />
+          <path d="M6 20h12" />
+        </svg>
+      </button>
       <button class="btn-secondary !min-h-9 !px-3 !py-2" :class="{ '!border-blue-500 !bg-blue-50 !text-blue-700': editor?.isActive('bulletList') }" title="Bullet List" aria-label="Bullet List" type="button" @mousedown.prevent @click="runCommand(() => editor?.chain().focus().toggleBulletList().run())">
         <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="5" cy="7" r="1.5" fill="currentColor" stroke="none" />
@@ -119,7 +154,7 @@ function setLink() {
           <path d="M4 16.5c.5-.3 1.1-.5 1.8-.5 1.2 0 2.2.7 2.2 1.8S7 20 5.8 20c-.7 0-1.3-.2-1.8-.5" />
         </svg>
       </button>
-      <button class="btn-secondary !min-h-9 !px-3 !py-2" :class="{ '!border-blue-500 !bg-blue-50 !text-blue-700': editor?.isActive('link') }" title="Link" aria-label="Link" type="button" @mousedown.prevent @click="setLink">
+      <button v-if="props.showLink" class="btn-secondary !min-h-9 !px-3 !py-2" :class="{ '!border-blue-500 !bg-blue-50 !text-blue-700': editor?.isActive('link') }" title="Link" aria-label="Link" type="button" @mousedown.prevent @click="setLink">
         <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24">
           <path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 1 1 7 7L17 13" />
           <path d="M14 11a5 5 0 0 1 0 7L12.5 19.5a5 5 0 1 1-7-7L7 11" />

@@ -13,7 +13,8 @@ const route = useRoute()
 const links = [
   { label: 'Dashboard', to: '/admin/dashboard' },
   { label: 'Jobs', to: '/admin/jobs' },
-  { label: 'Applications', to: '/admin/applications' }
+  { label: 'Applications', to: '/admin/applications' },
+  { label: 'Knowledgebase', to: '/admin/knowledgebase' }
 ]
 </script>
 
@@ -21,20 +22,20 @@ const links = [
   <div>
     <div
       v-if="props.open"
-      class="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm lg:hidden"
+      class="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-sm md:hidden"
       @click="emit('close')"
     />
 
     <aside
       :class="[
-        'admin-sidebar fixed inset-y-0 left-0 z-40 flex w-72 flex-col text-white transition-transform duration-300 lg:translate-x-0',
-        props.open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        'admin-sidebar fixed inset-y-0 left-0 z-40 flex w-72 flex-col text-white transition-transform duration-300 md:translate-x-0',
+        props.open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       ]"
     >
       <div class="admin-sidebar__brand">
         <div class="flex items-center justify-between gap-3">
           <div class="admin-sidebar__title">Job App</div>
-          <button aria-label="Close sidebar" class="btn-admin-outline lg:hidden !px-3" @click="emit('close')">
+          <button aria-label="Close sidebar" class="btn-admin-outline md:hidden !px-3" @click="emit('close')">
             <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24">
               <path d="M6 6l12 12" />
               <path d="M18 6L6 18" />
@@ -58,9 +59,10 @@ const links = [
       </nav>
 
       <div class="admin-sidebar__footer">
-        <button class="btn-admin-outline w-full justify-between text-left" @click="emit('logout')">
-          <span>Logout</span>
-          <span aria-hidden="true">-></span>
+        <button class="btn-admin-outline w-full justify-center" @click="emit('logout')" aria-label="Logout">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
         </button>
       </div>
     </aside>

@@ -42,26 +42,20 @@ onMounted(fetchUser)
   <div class="page-shell employer-ui">
     <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" @logout="signOut" />
 
-    <main class="admin-main lg:ml-72">
+    <main class="admin-main md:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-hero">
-          <div>
-            <NuxtLink class="admin-link" to="/admin/jobs">Back to Jobs</NuxtLink>
-            <div class="admin-eyebrow mt-4">Create Job</div>
-            <h1 class="admin-title">Launch a new role</h1>
-            <p class="admin-subtitle">Write the advertisement, choose whether the role is live, and set the contact email employers should monitor.</p>
+        <div class="flex items-center justify-between mb-5">
+          <NuxtLink class="btn-admin-outline" to="/admin/jobs">Back</NuxtLink>
+          <div class="flex items-center gap-3">
+            <button class="btn-admin-outline md:!hidden" @click="sidebarOpen = true">Menu</button>
           </div>
-          <div class="admin-toolbar">
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
-          </div>
-        </section>
+        </div>
 
         <form class="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]" @submit.prevent="submit">
           <div class="card space-y-4">
             <div class="admin-panel-header">
               <div>
                 <h2 class="admin-panel-title">Job advertisement</h2>
-                <p class="admin-panel-subtitle">Use the editor to create a polished job listing that is easy to share and review later.</p>
               </div>
             </div>
             <RichTextEditor v-model="form.advertisement" placeholder="Write the job advertisement..." />
@@ -73,7 +67,7 @@ onMounted(fetchUser)
               <div class="admin-panel-header">
                 <div>
                   <h2 class="admin-panel-title">Job settings</h2>
-                  <p class="admin-panel-subtitle">These details control who receives responses and whether the role is immediately visible.</p>
+                  <p class="admin-panel-subtitle">This is the email Applicants will see after they have filled the form</p>
                 </div>
               </div>
 
@@ -84,23 +78,16 @@ onMounted(fetchUser)
               </div>
 
               <div>
-                <label class="label">Active</label>
-                <div class="binary-grid">
-                  <label class="binary-option">
-                    <input v-model="form.is_active" :value="true" type="radio" />
-                    Yes
-                  </label>
-                  <label class="binary-option">
-                    <input v-model="form.is_active" :value="false" type="radio" />
-                    No
-                  </label>
-                </div>
+                <label class="label">Job Active?</label>
+                <label class="relative inline-flex items-center cursor-pointer mt-2">
+                  <input type="checkbox" v-model="form.is_active" class="sr-only peer">
+                  <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <span class="ml-3 text-sm font-medium text-slate-700">{{ form.is_active ? 'Yes' : 'No' }}</span>
+                </label>
               </div>
             </div>
 
-            <div class="admin-note">
-              <strong>Tip:</strong> active jobs can be shared as soon as you generate their tracking links, so this page is a good place to set the posting tone before publishing.
-            </div>
+
 
             <div class="flex flex-wrap gap-3">
               <button :disabled="loading" class="btn-admin-primary" type="submit">{{ loading ? 'Saving...' : 'Create Job' }}</button>

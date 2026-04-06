@@ -10,6 +10,7 @@ const saving = ref(false)
 const deleting = ref(false)
 const linkLoading = ref(false)
 const sidebarOpen = ref(false)
+const showDeleteModal = ref(false)
 const job = ref<any | null>(null)
 const form = reactive({
   advertisement: '<p></p>',
@@ -52,17 +53,13 @@ async function saveJob() {
   }
 }
 
-async function deleteJob() {
-  if (!job.value) {
-    return
-  }
+function promptDeleteJob() {
+  if (!job.value) return
+  showDeleteModal.value = true
+}
 
-  const confirmed = window.confirm(`Delete job ${job.value.job_id}? This cannot be undone.`)
-
-  if (!confirmed) {
-    return
-  }
-
+async function confirmDeleteJob() {
+  showDeleteModal.value = false
   deleting.value = true
 
   try {
@@ -117,22 +114,17 @@ onMounted(async () => {
   <div class="page-shell employer-ui">
     <AdminSidebar :open="sidebarOpen" @close="sidebarOpen = false" @logout="signOut" />
 
-    <main class="admin-main lg:ml-72">
+    <main class="admin-main md:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-hero">
-          <div>
-            <NuxtLink class="admin-link" to="/admin/jobs">Back to Jobs</NuxtLink>
-            <div class="admin-eyebrow mt-4">Edit Job</div>
-            <h1 class="admin-title">{{ job?.job_id || 'Loading job' }}</h1>
-            <p class="admin-subtitle">Refine the posting, update contact details, and manage every tracking link from one place.</p>
-          </div>
-          <div class="admin-toolbar">
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
+        <div class="flex items-center justify-between">
+          <NuxtLink class="btn-admin-outline" to="/admin/jobs">Back</NuxtLink>
+          <div class="flex items-center gap-3">
             <span v-if="job" :class="['admin-badge', form.is_active ? 'admin-badge--success' : 'admin-badge--neutral']">
               {{ form.is_active ? 'Active' : 'Inactive' }}
             </span>
+            <button class="btn-admin-outline md:!hidden" @click="sidebarOpen = true">Menu</button>
           </div>
-        </section>
+        </div>
 
         <div v-if="loading" class="card text-slate-500">Loading job...</div>
 
@@ -143,7 +135,6 @@ onMounted(async () => {
                 <div class="admin-panel-header">
                   <div>
                     <h2 class="admin-panel-title">Job advertisement</h2>
-                    <p class="admin-panel-subtitle">Keep the posting current so linked ads stay accurate everywhere the role is shared.</p>
                   </div>
                 </div>
                 <RichTextEditor v-model="form.advertisement" placeholder="Write the job advertisement..." />
@@ -154,7 +145,7 @@ onMounted(async () => {
                 <div class="admin-panel-header">
                   <div>
                     <h2 class="admin-panel-title">Job advertisement links</h2>
-                    <p class="admin-panel-subtitle">Generate, label, and monitor every shareable tracking link in one list.</p>
+                    <p class="admin-panel-subtitle">Generate a new link for each job board (Seek, Facebook, Gumtree) you post to.</p>
                   </div>
                   <button :disabled="linkLoading" class="btn-admin-primary" type="button" @click="generateLink">
                     {{ linkLoading ? 'Generating...' : 'Generate New Link' }}
@@ -172,7 +163,6 @@ onMounted(async () => {
                         <a :href="link.url" class="admin-link break-all" target="_blank">{{ link.url }}</a>
                         <div class="flex flex-wrap gap-2">
                           <span class="admin-badge admin-badge--neutral">Visits {{ link.visit_count }}</span>
-                          <button class="btn-admin-outline" type="button" @click="copyLink(link.url)">Copy</button>
                         </div>
                       </div>
 
@@ -191,7 +181,7 @@ onMounted(async () => {
                 <div class="admin-panel-header">
                   <div>
                     <h2 class="admin-panel-title">Job settings</h2>
-                    <p class="admin-panel-subtitle">Control where responses go and whether applicants can still access the posting.</p>
+                    <p class="admin-panel-subtitle">This is the email Applicants will see after they have filled the form</p>
                   </div>
                 </div>
 
@@ -202,33 +192,37 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                  <label class="label">Active</label>
-                  <div class="binary-grid">
-                    <label class="binary-option">
-                      <input v-model="form.is_active" :value="true" type="radio" />
-                      Yes
-                    </label>
-                    <label class="binary-option">
-                      <input v-model="form.is_active" :value="false" type="radio" />
-                      No
-                    </label>
-                  </div>
+                  <label class="label">Job Active?</label>
+                  <label class="relative inline-flex items-center cursor-pointer mt-2">
+                    <input type="checkbox" v-model="form.is_active" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-700">{{ form.is_active ? 'Yes' : 'No' }}</span>
+                  </label>
                   <p v-if="errors.is_active?.[0]" class="mt-2 text-sm text-red-600">{{ errors.is_active[0] }}</p>
                 </div>
               </div>
 
-              <div class="admin-note">
-                <strong>Quick reminder:</strong> generating a new link is useful when you want to track different job boards or campaigns separately without creating another role.
-              </div>
+
 
               <div class="flex flex-wrap items-center gap-3">
                 <button :disabled="saving" class="btn-admin-primary" type="button" @click="saveJob">{{ saving ? 'Saving...' : 'Save Job' }}</button>
-                <button :disabled="deleting" class="btn-admin-outline" type="button" @click="deleteJob">{{ deleting ? 'Deleting...' : 'Delete Job' }}</button>
+                <button :disabled="deleting" class="btn-admin-outline !border-red-200 !text-red-600 hover:!bg-red-50 hover:!border-red-300 ml-auto" type="button" @click="promptDeleteJob">{{ deleting ? 'Deleting...' : 'Delete Job' }}</button>
               </div>
             </div>
           </div>
         </template>
       </div>
     </main>
+
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center">
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Delete Job</h3>
+        <p class="text-sm text-slate-600 mb-6">Are you sure you want to delete this job? This action cannot be undone and will permanently erase this record.</p>
+        <div class="flex gap-3 justify-center">
+          <button class="btn-admin-outline flex-1" type="button" @click="showDeleteModal = false">Cancel</button>
+          <button class="btn-admin-primary !bg-red-600 hover:!bg-red-700 !border-red-600 flex-1" type="button" @click="confirmDeleteJob">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
