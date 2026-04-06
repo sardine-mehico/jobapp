@@ -1043,6 +1043,17 @@ select.input {
   padding: 0 0.12rem;
 }
 
+.prose-content a,
+.tiptap a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.prose-content a:hover,
+.tiptap a:hover {
+  color: #1d4ed8;
+}
+
 .tiptap {
   @apply min-h-48 rounded-b-md border border-t-0 border-slate-200 px-3 py-3 outline-none;
 }

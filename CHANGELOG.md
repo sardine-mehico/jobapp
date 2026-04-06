@@ -1,5 +1,12 @@
 # Changelog
 
+## version 1.9.3
+- Added Application list dynamic 'is_flagged' column with visual toggle
+- Converted global Dashboard and Application list table headers straight to sentence case
+- Implemented stripped-string DB checks for spaces in phone number searches
+- Styled Knowledgebase rich text links completely with default explicit blue colors and underlines
+- Unified Applicant list flagging row-highlight patterns
+
 ## version 1.9.2
 
 - Extensive UI layout, padding, and block streamlining for the admin interface

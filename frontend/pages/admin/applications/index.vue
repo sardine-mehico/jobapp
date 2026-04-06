@@ -37,15 +37,7 @@ function statusClass(application: any) {
 }
 
 function rowClass(application: any) {
-  if (isRead(application)) {
-    if (application.criminal_conviction || application.workers_comp) return 'bg-yellow-50 text-slate-600'
-    if (!application.reliable_transport || !application.driving_licence || !application.has_abn || !application.police_clearance) return 'bg-amber-50 text-slate-600'
-    return 'bg-slate-50 text-slate-600'
-  }
-
-  if (application.criminal_conviction || application.workers_comp) return 'bg-yellow-100 text-slate-900'
-  if (!application.reliable_transport || !application.driving_licence || !application.has_abn || !application.police_clearance) return 'bg-yellow-100 text-slate-900'
-  return 'bg-white text-slate-900'
+  return isRead(application) ? 'bg-white text-slate-500' : 'bg-white text-slate-900'
 }
 
 async function loadData(page = 1) {
@@ -115,6 +107,19 @@ async function openApplication(applicationId: string) {
   await navigateTo(`/admin/applications/${applicationId}`)
 }
 
+async function toggleFlag(event: Event, application: any) {
+  event.stopPropagation()
+  application.is_flagged = !application.is_flagged
+  try {
+    await api(`/applications/${application.id}`, {
+      method: 'PATCH',
+      body: { is_flagged: application.is_flagged }
+    })
+  } catch (error) {
+    application.is_flagged = !application.is_flagged
+  }
+}
+
 onMounted(async () => {
   await fetchUser()
   await loadData()
@@ -173,17 +178,17 @@ onMounted(async () => {
           <div class="admin-panel-header">
             <div>
               <h2 class="admin-panel-title">Application list</h2>
-              <p class="admin-panel-subtitle">Unread candidates stay brighter and bolder, while ranked applications soften into the background like read email.</p>
             </div>
           </div>
 
           <div class="table-wrap overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
-              <thead class="text-left">
+              <thead class="text-left text-xs tracking-wide text-slate-500">
                 <tr>
+                  <th class="px-4 py-3 font-medium w-12 text-center">Flag</th>
                   <th class="px-4 py-3 font-medium">
                     <button class="flex items-center gap-2" @click="toggleSort('submitted_at')">
-                      <span>Date Submitted</span>
+                      <span>Date submitted</span>
                       <span class="font-mono text-xs text-slate-400">{{ sortIcon('submitted_at') }}</span>
                     </button>
                   </th>
@@ -193,6 +198,7 @@ onMounted(async () => {
                       <span class="font-mono text-xs text-slate-400">{{ sortIcon('name') }}</span>
                     </button>
                   </th>
+                  <th class="px-4 py-3 font-medium">Contact no</th>
                   <th class="px-4 py-3 font-medium">Status</th>
                   <th class="px-4 py-3 font-medium">
                     <button class="flex items-center gap-2" @click="toggleSort('suburb')">
@@ -200,10 +206,10 @@ onMounted(async () => {
                       <span class="font-mono text-xs text-slate-400">{{ sortIcon('suburb') }}</span>
                     </button>
                   </th>
-                  <th class="px-4 py-3 font-medium">Job ID</th>
+                  <th class="px-4 py-3 font-medium">Job id</th>
                   <th class="px-4 py-3 font-medium">
                     <button class="flex items-center gap-2" @click="toggleSort('employer_ranking')">
-                      <span>Employer Ranking</span>
+                      <span>Employer ranking</span>
                       <span class="font-mono text-xs text-slate-400">{{ sortIcon('employer_ranking') }}</span>
                     </button>
                   </th>
@@ -216,8 +222,19 @@ onMounted(async () => {
                   :class="[rowClass(application), 'cursor-pointer transition-colors hover:bg-blue-50/60']"
                   @click="openApplication(application.id)"
                 >
+                  <td class="px-4 py-3 text-center">
+                    <button type="button" @click="toggleFlag($event, application)" class="focus:outline-none transition-transform hover:scale-110" title="Toggle flag">
+                      <svg v-if="application.is_flagged" class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M5 3v18h2V14h7.52l1.6 3H21V6h-7.52l-1.6-3H5z"/>
+                      </svg>
+                      <svg v-else class="w-5 h-5 text-slate-300 hover:text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12.36 6l.4 2H18v6h-3.36l-.4-2H7V6h5.36M14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6L14 4z"/>
+                      </svg>
+                    </button>
+                  </td>
                   <td class="px-4 py-3">{{ new Date(application.submitted_at).toLocaleString() }}</td>
                   <td :class="['px-4 py-3', isRead(application) ? 'font-medium' : 'font-semibold']">{{ application.name }}</td>
+                  <td class="px-4 py-3">{{ application.contact_no || '-' }}</td>
                   <td class="px-4 py-3">
                     <span :class="statusClass(application)">
                       {{ statusLabel(application) }}

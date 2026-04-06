@@ -37,6 +37,7 @@ class Application extends Model
         'references',
         'employer_ranking',
         'employer_notes',
+        'is_flagged',
         'submitted_at',
     ];
 
@@ -49,6 +50,7 @@ class Application extends Model
             'criminal_conviction' => 'boolean',
             'police_clearance' => 'boolean',
             'workers_comp' => 'boolean',
+            'is_flagged' => 'boolean',
             'submitted_at' => 'datetime',
         ];
     }

@@ -42,7 +42,6 @@ onMounted(async () => {
           <div class="admin-panel-header">
             <div>
               <h2 class="admin-panel-title">Hiring snapshot</h2>
-              <p class="admin-panel-subtitle">Use this table to compare job activity and focus on the roles that are moving.</p>
             </div>
           </div>
 
@@ -51,7 +50,7 @@ onMounted(async () => {
               <thead class="text-left">
                 <tr>
                   <th class="px-4 py-3 font-medium">Job</th>
-                  <th class="px-4 py-3 font-medium">Primary Link</th>
+                  <th class="px-4 py-3 font-medium">Primary link</th>
                   <th class="px-4 py-3 font-medium">Applications</th>
                   <th class="px-4 py-3 font-medium">Ideal (1)</th>
                   <th class="px-4 py-3 font-medium">Desirable (2)</th>

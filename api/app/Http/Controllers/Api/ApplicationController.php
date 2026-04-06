@@ -43,7 +43,7 @@ class ApplicationController extends Controller
                     $searchQuery
                         ->where('name', 'ilike', $searchPattern)
                         ->orWhere('suburb', 'ilike', $searchPattern)
-                        ->orWhere('contact_no', 'ilike', $searchPattern)
+                        ->orWhereRaw("REPLACE(contact_no, ' ', '') ILIKE ?", ['%'.str_replace(' ', '', $search).'%'])
                         ->orWhere('email', 'ilike', $searchPattern)
                         ->orWhere('availability', 'ilike', $searchPattern)
                         ->orWhere('visa_status', 'ilike', $searchPattern)
@@ -170,6 +170,7 @@ class ApplicationController extends Controller
             'references' => $application->references,
             'employer_ranking' => $application->employer_ranking,
             'employer_notes' => $application->employer_notes,
+            'is_flagged' => $application->is_flagged,
             'submitted_at' => $application->submitted_at,
             'created_at' => $application->created_at,
             'updated_at' => $application->updated_at,
@@ -203,6 +204,7 @@ class ApplicationController extends Controller
         if ($includeEmployerFields) {
             $rules['employer_ranking'] = ['nullable', 'integer', 'between:1,6'];
             $rules['employer_notes'] = ['nullable', 'string'];
+            $rules['is_flagged'] = ['nullable', 'boolean'];
         }
 
         return $rules;
