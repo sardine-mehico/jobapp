@@ -55,7 +55,7 @@ const applicationRankingLabel = computed(() => {
 function flagClass(color: 'yellow' | 'red') {
   return color === 'yellow'
     ? 'rounded-md bg-yellow-100 px-3 py-3'
-    : 'rounded-md bg-red-100 px-3 py-3'
+    : 'rounded-md bg-yellow-100 px-3 py-3'
 }
 
 function yesNo(value: boolean | null | undefined) {
@@ -92,6 +92,43 @@ function cloneApplication(source: any | null) {
     employer_ranking: source.employer_ranking ?? null,
     employer_notes: source.employer_notes || ''
   }
+}
+
+function normalizedDraftPayload(source: any) {
+  return {
+    name: source.name || '',
+    suburb: source.suburb || '',
+    contact_no: source.contact_no || '',
+    email: (source.email || '').trim().toLowerCase(),
+    availability: source.availability || '',
+    visa_status: source.visa_status || '',
+    visa_other: source.visa_status === 'other' ? (source.visa_other || '') : null,
+    reliable_transport: source.reliable_transport,
+    driving_licence: source.driving_licence,
+    has_abn: source.has_abn,
+    criminal_conviction: source.criminal_conviction,
+    police_clearance: source.police_clearance,
+    workers_comp: source.workers_comp,
+    education: source.education || '',
+    work_exp_1: source.work_exp_1 || '',
+    work_exp_2: source.work_exp_2 || null,
+    references: source.references || '',
+    employer_ranking: source.employer_ranking || null,
+    employer_notes: source.employer_notes || null
+  }
+}
+
+function buildChangedPayload() {
+  if (!application.value || !draft.value) {
+    return {}
+  }
+
+  const original = normalizedDraftPayload(cloneApplication(application.value))
+  const current = normalizedDraftPayload(draft.value)
+
+  return Object.fromEntries(
+    Object.entries(current).filter(([key, value]) => original[key as keyof typeof original] !== value)
+  )
 }
 
 function beginEdit() {
@@ -138,16 +175,17 @@ async function save() {
   saveError.value = ''
 
   try {
+    const payload = buildChangedPayload()
+
+    if (!Object.keys(payload).length) {
+      editMode.value = false
+      showSavedMessage('No changes to save.')
+      return
+    }
+
     application.value = await api(`/applications/${route.params.id}`, {
       method: 'PATCH',
-      body: {
-        ...draft.value,
-        email: draft.value.email.trim().toLowerCase(),
-        visa_other: draft.value.visa_status === 'other' ? draft.value.visa_other : null,
-        employer_ranking: draft.value.employer_ranking || null,
-        employer_notes: draft.value.employer_notes || null,
-        work_exp_2: draft.value.work_exp_2 || null
-      }
+      body: payload
     })
 
     draft.value = cloneApplication(application.value)
@@ -400,7 +438,7 @@ onMounted(async () => {
                   <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Do you have a valid driving licence?</div>
                   <div>{{ yesNo(application.driving_licence) }}</div>
                 </div>
-                <div class="md:col-span-2">
+                <div :class="['md:col-span-2', !application.has_abn ? flagClass('yellow') : '']">
                   <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Do you have an ABN?</div>
                   <div>{{ yesNo(application.has_abn) }}</div>
                 </div>

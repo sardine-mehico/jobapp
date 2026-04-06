@@ -38,13 +38,13 @@ function statusClass(application: any) {
 
 function rowClass(application: any) {
   if (isRead(application)) {
-    if (application.criminal_conviction || application.workers_comp) return 'bg-red-50 text-slate-600'
-    if (!application.reliable_transport || !application.driving_licence) return 'bg-amber-50 text-slate-600'
+    if (application.criminal_conviction || application.workers_comp) return 'bg-yellow-50 text-slate-600'
+    if (!application.reliable_transport || !application.driving_licence || !application.has_abn || !application.police_clearance) return 'bg-amber-50 text-slate-600'
     return 'bg-slate-50 text-slate-600'
   }
 
-  if (application.criminal_conviction || application.workers_comp) return 'bg-red-100 text-slate-900'
-  if (!application.reliable_transport || !application.driving_licence) return 'bg-yellow-100 text-slate-900'
+  if (application.criminal_conviction || application.workers_comp) return 'bg-yellow-100 text-slate-900'
+  if (!application.reliable_transport || !application.driving_licence || !application.has_abn || !application.police_clearance) return 'bg-yellow-100 text-slate-900'
   return 'bg-white text-slate-900'
 }
 

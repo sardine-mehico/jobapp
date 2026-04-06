@@ -32,14 +32,15 @@ const links = [
       ]"
     >
       <div class="admin-sidebar__brand">
-        <div>
-          <div class="admin-sidebar__eyebrow">Office PC Cleaning</div>
-          <div class="admin-sidebar__title">Employer Workspace</div>
-          <p class="admin-sidebar__text">Review applicants, manage jobs, and keep hiring work clear and organized.</p>
+        <div class="flex items-center justify-between gap-3">
+          <div class="admin-sidebar__title">Job App</div>
+          <button aria-label="Close sidebar" class="btn-admin-outline lg:hidden !px-3" @click="emit('close')">
+            <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M6 6l12 12" />
+              <path d="M18 6L6 18" />
+            </svg>
+          </button>
         </div>
-        <button class="btn-admin-outline lg:hidden" @click="emit('close')">
-          Close
-        </button>
       </div>
 
       <nav class="admin-sidebar__nav">

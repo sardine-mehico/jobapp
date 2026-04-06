@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApplicationController extends Controller
@@ -96,11 +97,23 @@ class ApplicationController extends Controller
 
     public function update(Request $request, Application $application): JsonResponse
     {
-        $data = $request->validate($this->applicationRules(includeEmployerFields: true));
+        $data = Validator::make(
+            $request->all(),
+            $this->applicationRules(includeEmployerFields: true, partial: true)
+        )->validate();
 
-        $data['visa_other'] = ($data['visa_status'] ?? null) === 'other'
-            ? ($data['visa_other'] ?? null)
-            : null;
+        $effectiveVisaStatus = $data['visa_status'] ?? $application->visa_status;
+        $effectiveVisaOther = array_key_exists('visa_other', $data)
+            ? $data['visa_other']
+            : $application->visa_other;
+
+        if ($effectiveVisaStatus === 'other' && blank($effectiveVisaOther)) {
+            Validator::make([], [])->errors()->add('visa_other', 'The visa other field is required when visa status is other.')->throwResponse();
+        }
+
+        if ($effectiveVisaStatus !== 'other') {
+            $data['visa_other'] = null;
+        }
 
         $application->update($data);
         $application->load(['job:id,job_id', 'trackingLink:id,code,label']);
@@ -163,26 +176,28 @@ class ApplicationController extends Controller
         ];
     }
 
-    private function applicationRules(bool $includeEmployerFields = false): array
+    private function applicationRules(bool $includeEmployerFields = false, bool $partial = false): array
     {
+        $presence = $partial ? ['sometimes'] : ['required'];
+
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'suburb' => ['required', 'string', 'max:255'],
-            'contact_no' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'availability' => ['required', 'string'],
-            'visa_status' => ['required', 'in:student_visa,partner_visa,tr,australian_pr,australian_citizen,other'],
-            'visa_other' => ['nullable', 'required_if:visa_status,other', 'string', 'max:255'],
-            'reliable_transport' => ['required', 'boolean'],
-            'driving_licence' => ['required', 'boolean'],
-            'has_abn' => ['required', 'boolean'],
-            'criminal_conviction' => ['required', 'boolean'],
-            'police_clearance' => ['required', 'boolean'],
-            'workers_comp' => ['required', 'boolean'],
-            'education' => ['required', 'string'],
-            'work_exp_1' => ['required', 'string'],
-            'work_exp_2' => ['nullable', 'string'],
-            'references' => ['required', 'string'],
+            'name' => [...$presence, 'string', 'max:255'],
+            'suburb' => [...$presence, 'string', 'max:255'],
+            'contact_no' => [...$presence, 'string', 'max:255'],
+            'email' => [...$presence, 'email', 'max:255'],
+            'availability' => [...$presence, 'string'],
+            'visa_status' => [...$presence, 'in:student_visa,partner_visa,tr,australian_pr,australian_citizen,other'],
+            'visa_other' => [$partial ? 'sometimes' : 'nullable', 'nullable', 'string', 'max:255'],
+            'reliable_transport' => [...$presence, 'boolean'],
+            'driving_licence' => [...$presence, 'boolean'],
+            'has_abn' => [...$presence, 'boolean'],
+            'criminal_conviction' => [...$presence, 'boolean'],
+            'police_clearance' => [...$presence, 'boolean'],
+            'workers_comp' => [...$presence, 'boolean'],
+            'education' => [...$presence, 'string'],
+            'work_exp_1' => [...$presence, 'string'],
+            'work_exp_2' => [$partial ? 'sometimes' : 'nullable', 'nullable', 'string'],
+            'references' => [...$presence, 'string'],
         ];
 
         if ($includeEmployerFields) {
