@@ -1,0 +1,15 @@
+.env
+.docker-data/
+.playwright-cli/
+.codex
+plan/
+
+api/.env
+api/vendor/
+api/storage/*.key
+api/storage/logs/
+api/bootstrap/cache/*.php
+
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
