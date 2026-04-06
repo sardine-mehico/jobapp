@@ -127,18 +127,6 @@ onMounted(async () => {
 
     <main class="admin-main lg:ml-72">
       <div class="admin-content space-y-6">
-        <section class="admin-hero">
-          <div>
-            <div class="admin-eyebrow">Applications</div>
-            <h1 class="admin-title">Candidate review queue</h1>
-            <p class="admin-subtitle">Unread applications stay prominent until you give them a ranking, making the list feel closer to an email inbox than a spreadsheet.</p>
-          </div>
-          <div class="admin-toolbar">
-            <button class="btn-admin-outline" @click="filtersOpen = !filtersOpen">{{ filtersOpen ? 'Hide Filters' : 'Filters' }}</button>
-            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
-          </div>
-        </section>
-
         <section class="admin-stat-grid">
           <article class="admin-stat-card">
             <div class="admin-stat-label">Results</div>
@@ -166,8 +154,11 @@ onMounted(async () => {
           <div class="admin-panel-header">
             <div>
               <h2 class="admin-panel-title">Search applications</h2>
-              <p class="admin-panel-subtitle">Search names, suburbs, visa details, notes, or ranking values to narrow the queue quickly.</p>
             </div>
+          </div>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <button class="btn-admin-outline" @click="filtersOpen = !filtersOpen">{{ filtersOpen ? 'Hide Filters' : 'Filters' }}</button>
+            <button class="btn-admin-outline lg:hidden" @click="sidebarOpen = true">Menu</button>
           </div>
           <div class="mt-5 flex flex-col gap-3 sm:flex-row">
             <input v-model="search" class="input" placeholder="Search applications" @keyup.enter="loadData()" />
