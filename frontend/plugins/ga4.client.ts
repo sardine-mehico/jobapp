@@ -6,20 +6,18 @@ declare global {
 }
 
 function isTrackedPath(path: string) {
-  if (path === '/thank-you') {
+  if (path === '/' || path === '/thank-you') {
     return true
   }
 
   if (
-    path === '/' ||
     path === '/employer/login' ||
     path.startsWith('/admin')
   ) {
     return false
   }
 
-  const publicApplicationPath = /^\/[^/]+$/
-  return publicApplicationPath.test(path)
+  return true
 }
 
 function loadGoogleTag(measurementId: string) {

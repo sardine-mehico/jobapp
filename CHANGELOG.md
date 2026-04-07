@@ -1,5 +1,10 @@
 # Changelog
 
+## version 1.9.5
+- Overhauled native Google Analytics 4 (GA4) configuration routing validation checks.
+- Enabled GA4 telemetry universally across all generic public paths (including the root landing index layout).
+- Restructured tracking blocks natively using a fallback tracking array to bypass stringent regex filtering boundaries.
+
 ## version 1.9.4
 - Configured Nuxt Progressive Web App (PWA) manifest using specific 'j icon' artwork assets.
 - Explicitly injected metadata link tags to enforce Favicon rendering across browser tabs and bookmark integrations.
