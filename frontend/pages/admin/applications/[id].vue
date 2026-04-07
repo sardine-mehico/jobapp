@@ -442,6 +442,8 @@ onMounted(async () => {
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Visa / Residency Status</div><div>{{ visaStatusLabel(application.visa_status) }}</div></div>
                 <div v-if="application.visa_status === 'other' && application.visa_other" class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Please explain visa type</div><div>{{ application.visa_other }}</div></div>
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Which days/times are you available?</div><div>{{ application.availability }}</div></div>
+                
+                <div class="md:col-span-2 border-b border-slate-200 pb-2 mt-4 text-base font-semibold text-slate-900">Checks</div>
                 <div :class="['md:col-span-2', !application.reliable_transport ? flagClass('yellow') : '']">
                   <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Do you have a reliable transport?</div>
                   <div>{{ yesNo(application.reliable_transport) }}</div>
@@ -466,11 +468,13 @@ onMounted(async () => {
                   <div class="text-xs uppercase tracking-[0.2em] text-slate-400">Have you ever claimed Workers Compensation, Accident / Sickness Insurance?</div>
                   <div>{{ yesNo(application.workers_comp) }}</div>
                 </div>
+                
+                <div class="md:col-span-2 border-b border-slate-200 pb-2 mt-4 text-base font-semibold text-slate-900">Education, Work & References</div>
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Education</div><div>{{ application.education }}</div></div>
-                <div class="md:col-span-2 border-b border-slate-200 pb-2 text-base font-semibold text-slate-900">Work History</div>
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Job 1</div><div>{{ application.work_exp_1 }}</div></div>
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">Job 2</div><div>{{ application.work_exp_2 }}</div></div>
                 <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">References</div><div>{{ application.references }}</div></div>
+                <div class="md:col-span-2"><div class="text-xs uppercase tracking-[0.2em] text-slate-400">I declare that the information I have provided is true and correct</div><div>Yes</div></div>
               </div>
             </div>
 
@@ -501,36 +505,6 @@ onMounted(async () => {
                 </div>
 
                 <span v-if="saveMessage" class="text-sm font-medium text-emerald-700">{{ saveMessage }}</span>
-              </div>
-
-              <div class="card space-y-4">
-                <div class="admin-panel-header">
-                  <div>
-                    <h2 class="admin-panel-title">Quick checks</h2>
-                    <p class="admin-panel-subtitle">Useful decision points surfaced on the side so they are easy to revisit while ranking.</p>
-                  </div>
-                </div>
-
-                <div class="admin-kv">
-                  <div class="admin-kv-label">Reliable transport</div>
-                  <div class="admin-kv-value">{{ yesNo(application.reliable_transport) }}</div>
-                </div>
-                <div class="admin-kv">
-                  <div class="admin-kv-label">Driving licence</div>
-                  <div class="admin-kv-value">{{ yesNo(application.driving_licence) }}</div>
-                </div>
-                <div class="admin-kv">
-                  <div class="admin-kv-label">Police clearance</div>
-                  <div class="admin-kv-value">{{ yesNo(application.police_clearance) }}</div>
-                </div>
-                <div class="admin-kv">
-                  <div class="admin-kv-label">Criminal conviction</div>
-                  <div class="admin-kv-value">{{ yesNo(application.criminal_conviction) }}</div>
-                </div>
-                <div class="admin-kv">
-                  <div class="admin-kv-label">Workers compensation history</div>
-                  <div class="admin-kv-value">{{ yesNo(application.workers_comp) }}</div>
-                </div>
               </div>
             </div>
           </div>

@@ -1,5 +1,12 @@
 # Changelog
 
+## version 1.9.4
+- Configured Nuxt Progressive Web App (PWA) manifest using specific 'j icon' artwork assets.
+- Explicitly injected metadata link tags to enforce Favicon rendering across browser tabs and bookmark integrations.
+- Remodeled Application Details interface and PDF export generation into three distinct modular structural sections (Basics, Checks, and Custom Attributes).
+- Removed the standalone 'Quick checks' element.
+- Added static information declaration statement strictly to Application PDFs.
+
 ## version 1.9.3
 - Added Application list dynamic 'is_flagged' column with visual toggle
 - Converted global Dashboard and Application list table headers straight to sentence case

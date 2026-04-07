@@ -199,7 +199,6 @@ onMounted(async () => {
                     </button>
                   </th>
                   <th class="px-4 py-3 font-medium">Contact no</th>
-                  <th class="px-4 py-3 font-medium">Status</th>
                   <th class="px-4 py-3 font-medium">
                     <button class="flex items-center gap-2" @click="toggleSort('suburb')">
                       <span>Suburb</span>
@@ -207,6 +206,7 @@ onMounted(async () => {
                     </button>
                   </th>
                   <th class="px-4 py-3 font-medium">Job id</th>
+                  <th class="px-4 py-3 font-medium">Status</th>
                   <th class="px-4 py-3 font-medium">
                     <button class="flex items-center gap-2" @click="toggleSort('employer_ranking')">
                       <span>Employer ranking</span>
@@ -235,13 +235,13 @@ onMounted(async () => {
                   <td class="px-4 py-3">{{ new Date(application.submitted_at).toLocaleString() }}</td>
                   <td :class="['px-4 py-3', isRead(application) ? 'font-medium' : 'font-semibold']">{{ application.name }}</td>
                   <td class="px-4 py-3">{{ application.contact_no || '-' }}</td>
+                  <td class="px-4 py-3">{{ application.suburb }}</td>
+                  <td class="px-4 py-3">{{ application.job?.job_id }}</td>
                   <td class="px-4 py-3">
                     <span :class="statusClass(application)">
                       {{ statusLabel(application) }}
                     </span>
                   </td>
-                  <td class="px-4 py-3">{{ application.suburb }}</td>
-                  <td class="px-4 py-3">{{ application.job?.job_id }}</td>
                   <td class="px-4 py-3">{{ application.employer_ranking || '-' }}</td>
                 </tr>
               </tbody>

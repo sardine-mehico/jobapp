@@ -17,7 +17,7 @@
     <h1>Job Application</h1>
     <div class="meta">Application for {{ $application->job?->job_id ?? 'Unknown Job' }} submitted {{ $application->submitted_at?->format('Y-m-d H:i') }}</div>
 
-    <h2>Applicant Details</h2>
+    <h2>Applicant Basics</h2>
     <table>
         <tr><th>Name</th><td>{{ $application->name }}</td></tr>
         <tr><th>Suburb</th><td>{{ $application->suburb }}</td></tr>
@@ -26,16 +26,25 @@
         <tr><th>Availability</th><td>{{ $application->availability }}</td></tr>
         <tr><th>Visa Status</th><td>{{ $application->visa_status }}</td></tr>
         <tr><th>Visa Other</th><td>{{ $application->visa_other ?: '-' }}</td></tr>
+    </table>
+
+    <h2>Checks</h2>
+    <table>
         <tr><th>Reliable Transport</th><td>{{ $application->reliable_transport ? 'Yes' : 'No' }}</td></tr>
         <tr><th>Driving Licence</th><td>{{ $application->driving_licence ? 'Yes' : 'No' }}</td></tr>
         <tr><th>Has ABN</th><td>{{ $application->has_abn ? 'Yes' : 'No' }}</td></tr>
         <tr><th>Criminal Conviction</th><td>{{ $application->criminal_conviction ? 'Yes' : 'No' }}</td></tr>
         <tr><th>Police Clearance</th><td>{{ $application->police_clearance ? 'Yes' : 'No' }}</td></tr>
         <tr><th>Workers Comp</th><td>{{ $application->workers_comp ? 'Yes' : 'No' }}</td></tr>
+    </table>
+
+    <h2>Education, Work & References</h2>
+    <table>
         <tr><th>Education</th><td>{{ $application->education }}</td></tr>
         <tr><th>Work Experience 1</th><td>{{ $application->work_exp_1 }}</td></tr>
         <tr><th>Work Experience 2</th><td>{{ $application->work_exp_2 }}</td></tr>
         <tr><th>References</th><td>{{ $application->references }}</td></tr>
+        <tr><th>I declare that the information I have provided is true and correct</th><td>Yes</td></tr>
     </table>
 </body>
 </html>
