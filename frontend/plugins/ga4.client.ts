@@ -5,66 +5,11 @@ declare global {
   }
 }
 
-function isTrackedPath(path: string) {
-  if (path === '/' || path === '/thank-you') {
-    return true
-  }
-
-  if (
+function isExcludedPath(path: string) {
+  return (
     path === '/employer/login' ||
     path.startsWith('/admin')
-  ) {
-    return false
-  }
-
-  return true
-}
-
-function loadGoogleTag(measurementId: string) {
-  const scriptId = 'jobapp-ga4-script'
-
-  if (document.getElementById(scriptId)) {
-    return
-  }
-
-  const script = document.createElement('script')
-  script.id = scriptId
-  script.async = true
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`
-  document.head.appendChild(script)
-}
-
-function initGoogleAnalytics(measurementId: string) {
-  window.dataLayer = window.dataLayer || []
-
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer.push(args)
-  }
-
-  window.gtag('js', new Date())
-  window.gtag('config', measurementId, {
-    send_page_view: false,
-  })
-}
-
-function trackPageView(measurementId: string, fullPath: string) {
-  if (!window.gtag) {
-    return
-  }
-
-  const [pathWithoutQuery, search = ''] = fullPath.split('?')
-
-  if (!isTrackedPath(pathWithoutQuery || '/')) {
-    return
-  }
-
-  window.gtag('event', 'page_view', {
-    page_path: fullPath,
-    page_location: window.location.href,
-    page_title: document.title,
-    send_to: measurementId,
-    ...(search ? { page_search: `?${search}` } : {}),
-  })
+  )
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -72,34 +17,56 @@ export default defineNuxtPlugin((nuxtApp) => {
   const measurementId = String(runtimeConfig.public.ga4Id || '').trim()
   const isProduction = import.meta.env.PROD
 
-  if (!measurementId || !isProduction || !process.client) {
+  if (!measurementId || !isProduction) {
     return
   }
 
-  loadGoogleTag(measurementId)
-  initGoogleAnalytics(measurementId)
+  // Standard gtag bootstrap - dataLayer queue must exist before script loads
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function gtag(...args: unknown[]) {
+    window.dataLayer.push(args)
+  }
+  window.gtag('js', new Date())
+  // Tell GA4 not to fire an automatic page_view on load - we'll do it manually for SPA navigation
+  window.gtag('config', measurementId, { send_page_view: false })
+
+  // Inject the gtag/js script (note: NO encodeURIComponent - the ID must be raw)
+  const scriptId = 'jobapp-ga4-script'
+  if (!document.getElementById(scriptId)) {
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.async = true
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+    document.head.appendChild(script)
+  }
 
   let lastTrackedPath = ''
 
-  const maybeTrackCurrentRoute = () => {
-    const fullPath = nuxtApp.$router.currentRoute.value.fullPath
+  const sendPageView = (fullPath: string) => {
+    const path = fullPath.split('?')[0] || '/'
 
-    if (fullPath === lastTrackedPath) {
-      return
-    }
+    if (isExcludedPath(path)) return
+    if (fullPath === lastTrackedPath) return
 
     lastTrackedPath = fullPath
-    trackPageView(measurementId, fullPath)
+
+    // Push directly to dataLayer - works even before gtag/js script finishes loading
+    window.gtag!('event', 'page_view', {
+      page_path: fullPath,
+      page_location: window.location.origin + fullPath,
+      page_title: document.title,
+      send_to: measurementId,
+    })
   }
 
-  // Track the initial page load (fires once on first mount)
+  // Track initial page load (critical for SPA direct-URL visits)
   nuxtApp.hook('app:mounted', () => {
-    setTimeout(maybeTrackCurrentRoute, 0)
+    const initialPath = nuxtApp.$router.currentRoute.value.fullPath
+    sendPageView(initialPath)
   })
 
-  nuxtApp.hook('page:finish', maybeTrackCurrentRoute)
-
-  nuxtApp.$router.afterEach(() => {
-    queueMicrotask(maybeTrackCurrentRoute)
+  // Track subsequent SPA navigations
+  nuxtApp.$router.afterEach((to) => {
+    sendPageView(to.fullPath)
   })
 })

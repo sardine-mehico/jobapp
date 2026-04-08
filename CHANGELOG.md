@@ -1,5 +1,11 @@
 # Changelog
 
+## version 1.9.7
+- Rewrote GA4 plugin using standard Google gtag bootstrap pattern.
+- Fixed encodeURIComponent bug corrupting gtag/js script URL.
+- Simplified SPA navigation tracking to single router.afterEach listener.
+- GA4 dataLayer queue now initialised before async script loads, ensuring no events are lost.
+
 ## version 1.9.6
 - Fixed Google Analytics 4 (GA4) not tracking initial direct page loads in SPA mode.
 - Added `app:mounted` hook to fire `page_view` on first load regardless of entry URL.
