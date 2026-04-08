@@ -1,5 +1,8 @@
 # Changelog
 
+## version 1.9.71
+- Switched GA4 tag ID from G- measurement ID to GT- Google Tag container ID (GT-MKBWX33H) to resolve missing analytics hits.
+
 ## version 1.9.7
 - Rewrote GA4 plugin using standard Google gtag bootstrap pattern.
 - Fixed encodeURIComponent bug corrupting gtag/js script URL.
