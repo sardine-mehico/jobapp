@@ -1,5 +1,10 @@
 # Changelog
 
+## version 1.9.6
+- Fixed Google Analytics 4 (GA4) not tracking initial direct page loads in SPA mode.
+- Added `app:mounted` hook to fire `page_view` on first load regardless of entry URL.
+- Confirmed all public paths (e.g. /34fefe, /nojubn, /) are tracked; admin and login routes remain excluded.
+
 ## version 1.9.5
 - Overhauled native Google Analytics 4 (GA4) configuration routing validation checks.
 - Enabled GA4 telemetry universally across all generic public paths (including the root landing index layout).

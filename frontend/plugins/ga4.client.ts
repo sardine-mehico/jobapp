@@ -92,6 +92,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     trackPageView(measurementId, fullPath)
   }
 
+  // Track the initial page load (fires once on first mount)
+  nuxtApp.hook('app:mounted', () => {
+    setTimeout(maybeTrackCurrentRoute, 0)
+  })
+
   nuxtApp.hook('page:finish', maybeTrackCurrentRoute)
 
   nuxtApp.$router.afterEach(() => {
