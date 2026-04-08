@@ -1,5 +1,12 @@
 # Changelog
 
+## version 1.9.72
+- Completely removed all previous GA4 traces and reimplemented from scratch.
+- New analytics.client.ts plugin uses useHead() to inject gtag/js into <head>.
+- Initial page_view fires via gtag('config') on load; SPA navigations tracked via router.afterEach.
+- Zero-config when NUXT_PUBLIC_GA4_ID is absent - plugin is completely inert.
+- Verified: gtag script loads (200 OK), dataLayer initialises correctly, GTM events (dom, load, scrollDepth) fire.
+
 ## version 1.9.71
 - Switched GA4 tag ID from G- measurement ID to GT- Google Tag container ID (GT-MKBWX33H) to resolve missing analytics hits.
 

@@ -28,16 +28,8 @@ async function submit() {
   <div class="page-shell employer-ui flex items-center justify-center px-4 py-8 sm:py-12">
     <div class="admin-login-shell">
       <div class="admin-login-card">
-        <div class="admin-login-aside">
-          <div class="text-sm font-semibold uppercase tracking-[0.28em] text-blue-100">Employer Portal</div>
-          <h1 class="mt-4 text-4xl font-semibold tracking-tight text-white">Manage hiring with less friction.</h1>
-          <p>Keep job ads, applicant reviews, and employer notes together in a cleaner workspace designed for quick decisions.</p>
-
-          <ul class="admin-login-list">
-            <li>Track read and unread applications at a glance.</li>
-            <li>Edit employer-side job and applicant records from one place.</li>
-            <li>Review rankings, links, and job activity in a consistent blue UI.</li>
-          </ul>
+        <div class="admin-login-aside flex items-center justify-center">
+          <h1 class="text-4xl font-semibold tracking-tight text-white text-center">Employer Portal</h1>
         </div>
 
         <div class="admin-login-form">
