@@ -2,8 +2,11 @@ export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
   const gaId = config.public.gaId
 
+  console.log('[Analytics] Plugin loaded, gaId:', gaId)
+
   // Return early if gaId is empty or falsy
   if (!gaId) {
+    console.log('[Analytics] No GA ID, skipping')
     return
   }
 

@@ -1,0 +1,114 @@
+# Project Regeneration Prompt: JobApp 
+
+You are an expert full-stack developer. Your task is to rebuild "JobApp", a robust applicant tracking and job portal system. Please meticulously recreate the following architecture, logic, and features.
+
+## 1. Tech Stack
+- **Backend**: PHP 8.3, Laravel 13, PostgreSQL 18, Redis (Cache, Sessions, Queues).
+- **Frontend**: Nuxt 3 (SSR: false / SPA mode), Vue 3, Vue Router, Tailwind CSS v4, Tiptap editor (`@tiptap/vue-3`) for rich text, `@vite-pwa/nuxt` for PWA capabilities.
+- **Docker**: A `docker-compose.yml` to orchestrate `jobapp-api`, `jobapp-nuxt` (args: GA_ID), `jobapp-db` (postgres), and `jobapp-redis` (redis:7-alpine).
+
+## 2. Infrastructure & Docker Compose
+Create a `docker-compose.yml` with:
+- **jobapp-api**: Build context `./api`. Port 9000:80. Dependencies: DB, Redis. Env variables for APP, DB, REDIS, SANCTUM_STATEFUL_DOMAINS (admin.yourdomain.com, localhost:3000), SESSION_DOMAIN (.yourdomain.com).
+- **jobapp-nuxt**: Build context `./frontend`. Port 3000:3000. Dependencies: API.
+- **jobapp-db**: `postgres:18` image. Port 5434:5432.
+- **jobapp-redis**: `redis:7-alpine` image. Port 6380:6379.
+
+## 3. Database Schema & Models
+IMPORTANT: Implement `HasUuids` on all primary models (UUIDs for primary keys). Provide proper Eloquent relationships.
+
+### Users Table
+- Standard Laravel users table but with `uuid('id')->primary()`.
+
+### Jobs Table
+- `id` (UUID)
+- `job_id` (String, UNIQUE). Ex: "CLN-001". Auto-incrementing logic on creation.
+- `advertisement` (LongText) - stores HTML from Tiptap.
+- `positive_points` (LongText) - stores HTML from Tiptap.
+- `contact_email` (String)
+- `is_active` (Boolean, default true)
+- Timestamps
+
+### Tracking Links Table
+- `id` (UUID)
+- `job_id` (UUID, Foreign Key, cascade on delete)
+- `code` (String(6), UNIQUE) - auto-generated random lowercase alphanumeric string.
+- `label` (String, nullable) - e.g. "LinkedIn", "Indeed".
+- `external_post_url` (String, nullable)
+- `visit_count` (UnsignedInteger, default 0)
+- Timestamps
+
+### Applications Table
+- `id` (UUID)
+- `job_id` (UUID, Foreign Key, cascade on delete)
+- `tracking_link_id` (UUID, Foreign Key, null on delete)
+- **Applicant Info**: `name`, `suburb`, `contact_no`, `email`
+- **Details**: `availability` (text), `visa_status` (string/enum: student_visa, partner_visa, tr, australian_pr, australian_citizen, other), `visa_other` (string, nullable)
+- **Binary Responses (Booleans)**: `reliable_transport`, `driving_licence`, `has_abn`, `criminal_conviction`, `police_clearance`, `workers_comp`
+- **History**: `education` (text), `work_exp_1` (text), `work_exp_2` (text/nullable), `references` (text)
+- **Employer Metadata**: `employer_ranking` (unsignedTinyInteger 1-6, nullable, indexed), `employer_notes` (text, nullable), `is_flagged` (boolean, default false)
+- `submitted_at` (Timestamp, indexed)
+- Timestamps
+
+### Knowledgebase Notes Table
+- `id` (UUID)
+- `title` (String)
+- `note` (LongText, nullable)
+- Timestamps
+
+## 4. Backend (Laravel API) Let's Break Down the Logic
+
+**Auth (Laravel Sanctum - Stateful)**:
+- Endpoints: `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/user`.
+
+**Job Management (Admin)**:
+- Endpoints: `GET`, `POST`, `GET {job}`, `PUT {job}`, `DELETE {job}` for `/api/jobs`.
+- On `POST` generating the custom `job_id` (e.g., getting the latest and doing numeric increment logic `CLN-001`).
+- Returning jobs with a count of `applications` and an aggregated `ranking_counts` mapped object (count of rankings 1, 2, and 3). Include nested `trackingLinks`.
+- Job Search: Search by string across `job_id`, `advertisement`, `contact_email` OR relation searches (tracking link code/label, application name/email/suburb).
+
+**Tracking Links Management**:
+- `POST /api/jobs/{job}/tracking-links`, `PUT /api/tracking-links/{trackingLink}`, `DELETE /api/tracking-links/{trackingLink}`
+- Code generator needs `Str::random(6)` looping until unique.
+
+**Applications Management**:
+- `GET /api/applications` with extremely robust search and filter capabilities:
+    - Filter by: `suburb`, `date_from`, `date_to`, `job_id`, `ranking`.
+    - Sortable by: `submitted_at`, `name`, `suburb`, `employer_ranking`.
+    - Text Search: searches across name, suburb, contact_no, email, text fields, relation `job_id`, tracking link `code`. If search is "yes/true/no/false", it strictly boolean filters the binary response columns. If numeric, matches `employer_ranking`.
+- `GET /api/applications/{application}`
+- `PATCH /api/applications/{application}` to update both applicant info and employer metadata (`employer_notes`, `employer_ranking`, `is_flagged`).
+- `GET /api/applications/{application}/export-pdf`: Export an application to a PDF using DOMPDF. Use streamed download response.
+
+**Knowledgebase**:
+- Routine CRUD on `/api/knowledgebase-notes`.
+
+**Public Endpoints (Throttled)**:
+- `GET /api/public/jobs` - Return only `is_active` jobs with their first created tracking link. Only summary fields: `id`, `job_id`, `summary_line` (parsed first line of HTML), `preview_text` (max 4 lines of HTML parsed to plaintext). 
+- `GET /api/public/jobs/{job}` - Same + full `advertisement`.
+- `GET /api/apply/{code}` - Return basic details + increment TrackingLink `visit_count`. Return 404 if inactive job.
+- `POST /api/apply/{code}` - Submit the massive application. Store it linked to `job_id` and `tracking_link_id`.
+
+## 5. Frontend (Nuxt 3 SPA) Structure & Features
+
+**Configuration**:
+- `ssr: false` in `nuxt.config.ts`.
+- Setup Vite PWA plugin with standard maskable icons.
+- Setup Tailwind V4 in Vite plugins. 
+
+**Public Job Application Flow (`/[code].vue`)**:
+- 3-Step Wizard Form, fully client-side validated before submission.
+- **Page 1**: `name`, `suburb`, `contact_no`, `email`, `visa_status`, `visa_other` (required if "other").
+- **Page 2**: `availability` (textarea), and the Binary Yes/No grid for: Transport, Driving Licence, ABN, Criminal Conviction, Police Clearance, Workers Comp.
+- **Page 3**: `education` (textarea), `work_exp_1` (textarea), `work_exp_2` (textarea), `references` (textarea), and a Confirmation Checkbox (`declaration`).
+- Send `POST` to `/api/apply/{code}`, handle server 422 errors gracefully, then redirect to `/thank-you` with query `?email=xxx`.
+
+**Admin Navigation Components**:
+- Make sure to have an `AdminSidebar.vue` and a `RichTextEditor.vue` (using Vue3 Tiptap with starter-kit, link, and underline extensions).
+
+**Dashboard / Views requirements**:
+- Views to browse Jobs (`/jobs`), Applications (table with filtering/sorting based on the meticulous backend logic), Employer notes, Admin configuration.
+- Implement proper layout wrapping with Vue Router middleware protecting routes if unauthenticated.
+- Ensure form submission states disable buttons to avoid double submission.
+
+*Note: Please ignore Google Analytics integration implementation for now.*
