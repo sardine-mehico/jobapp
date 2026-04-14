@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
 
+const gaId = process.env.NUXT_PUBLIC_GA_ID || ''
 export default defineNuxtConfig({
   compatibilityDate: '2025-03-01',
   devtools: { enabled: true },
@@ -63,7 +64,23 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap' }
-      ]
+      ],
+      script: gaId ? [
+        {
+          src: `https://www.googletagmanager.com/gtag/js?id=${gaId}`,
+          async: true,
+          tagPosition: 'head'
+        },
+        {
+          innerHTML: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}', { send_page_view: false });
+          `,
+          tagPosition: 'head'
+        }
+      ] : []
     }
   },
   runtimeConfig: {

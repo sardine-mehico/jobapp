@@ -1,3 +1,10 @@
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
+  }
+}
+
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
   const gaId = config.public.gaId
@@ -6,38 +13,23 @@ export default defineNuxtPlugin(() => {
 
   // Return early if gaId is empty or falsy
   if (!gaId) {
-    console.log('[Analytics] No GA ID, skipping')
+    console.log('[Analytics] No GA ID, skipping Route Tracking')
     return
   }
-
-  // Inject Google Analytics scripts into <head>
-  useHead({
-    script: [
-      {
-        src: `https://www.googletagmanager.com/gtag/js?id=${gaId}`,
-        async: true
-      },
-      {
-        innerHTML: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${gaId}', { send_page_view: false });
-        `
-      }
-    ]
-  })
 
   // Track page views on route changes
   const router = useRouter()
   router.afterEach((to) => {
     // Guard to check if gtag is a function
-    if (typeof window.gtag === 'function') {
+    if (typeof window.gtag !== 'function') return
+
+    nextTick(() => {
       window.gtag('event', 'page_view', {
         page_path: to.fullPath,
+        page_location: window.location.href,
         page_title: document.title,
         send_to: gaId
       })
-    }
+    })
   })
 })

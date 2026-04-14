@@ -36,13 +36,13 @@ services:
     build:
       context: ./frontend
       args:
-        NUXT_PUBLIC_GA_ID: "${GA_ID}"
+        NUXT_PUBLIC_GA_ID: "${NUXT_PUBLIC_GA_ID}"
     container_name: jobapp-nuxt
     restart: unless-stopped
     environment:
       NUXT_PUBLIC_API_BASE: "http://localhost:9000/api"
       NUXT_PUBLIC_GA4_ID: "${NUXT_PUBLIC_GA4_ID:-}"
-      NUXT_PUBLIC_GA_ID: "${GA_ID}"
+      NUXT_PUBLIC_GA_ID: "${NUXT_PUBLIC_GA_ID}"
     depends_on:
       - jobapp-api
     ports:
