@@ -70,7 +70,7 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:9000/api',
       ga4Id: process.env.NUXT_PUBLIC_GA4_ID || '',
-      gaId: ''  // populated from NUXT_PUBLIC_GA_ID env var at runtime
+      gaId: process.env.NUXT_PUBLIC_GA_ID || ''
     }
   }
 })

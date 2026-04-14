@@ -33,7 +33,10 @@ services:
       - "9000:80"
 
   jobapp-nuxt:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NUXT_PUBLIC_GA_ID: "${GA_ID}"
     container_name: jobapp-nuxt
     restart: unless-stopped
     environment:

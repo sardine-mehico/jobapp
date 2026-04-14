@@ -9,6 +9,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --no-audit --no-fund
 
+# Accept build arguments for runtime config
+ARG NUXT_PUBLIC_GA_ID
+ENV NUXT_PUBLIC_GA_ID=${NUXT_PUBLIC_GA_ID}
+
 ARG CACHE_BUST=1
 COPY . .
 
